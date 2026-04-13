@@ -1,0 +1,63 @@
+{
+  "name": "makeit-sns-automation",
+  "version": "0.1.0",
+  "description": "메이킷 SNS 자동화 - SNS 콘텐츠 자동 발행 데스크톱 앱",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder",
+    "build:win": "electron-builder --win --x64",
+    "build:mac": "electron-builder --mac --x64 --arm64"
+  },
+  "author": "npermovie",
+  "license": "UNLICENSED",
+  "devDependencies": {
+    "electron": "^28.0.0",
+    "electron-builder": "^24.0.0"
+  },
+  "build": {
+    "appId": "com.snsmakeit.automation",
+    "productName": "메이킷 SNS자동화",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "auth-preload.js",
+      "renderer/**/*",
+      "python-bridge.js",
+      "node_modules/**/*"
+    ],
+    "extraResources": [
+      {
+        "from": "../python",
+        "to": "python",
+        "filter": ["**/*.py", "requirements.txt"]
+      },
+      {
+        "from": "python-runtime",
+        "to": "python-runtime",
+        "filter": ["**/*"]
+      }
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": "build/icon.ico"
+    },
+    "mac": {
+      "target": ["dmg", "zip"],
+      "category": "public.app-category.productivity"
+    },
+    "protocols": [
+      {
+        "name": "메이킷 SNS 자동화",
+        "schemes": ["makeit-sns"]
+      }
+    ],
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    }
+  }
+}

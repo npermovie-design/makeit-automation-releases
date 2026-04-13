@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>메이킷 SNS 자동화</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app">
+    <!-- ========== 사이드바 ========== -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="brand-title">메이킷 SNS 자동화</div>
+        <a class="brand-link" id="brandLink" href="#">snsmakeit.com</a>
+      </div>
+      <nav class="sidebar-nav">
+        <button class="nav-item active" data-panel="home">
+          <span class="nav-dot"></span>홈
+        </button>
+        <div class="nav-group-label">네이버 자동화</div>
+        <button class="nav-item nav-sub" data-panel="naver-account">
+          <span class="nav-dot"></span>계정 설정
+        </button>
+        <button class="nav-item nav-sub" data-panel="naver-blog">
+          <span class="nav-dot"></span>블로그
+        </button>
+        <button class="nav-item nav-sub" data-panel="naver-cafe">
+          <span class="nav-dot"></span>카페
+        </button>
+        <div class="nav-group-label" style="margin-top:8px;">관리</div>
+        <button class="nav-item nav-sub" data-panel="calendar">
+          <span class="nav-dot"></span>자동화 현황
+        </button>
+        <button class="nav-item nav-sub" data-panel="execlog">
+          <span class="nav-dot"></span>실행 로그
+        </button>
+        <button class="nav-item nav-sub" data-panel="about">
+          <span class="nav-dot"></span>정보
+        </button>
+      </nav>
+      <div class="sidebar-footer">
+        <div class="user-badge" id="userBadge">
+          <div class="user-dot dot-gray"></div>
+          <div class="user-text">로그인 필요</div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ========== 메인 ========== -->
+    <main class="main">
+      <!-- 홈 패널 -->
+      <section class="panel" data-panel="home">
+        <div class="panel-header">
+          <h1>메이킷 SNS 자동화</h1>
+          <p class="panel-sub">네이버 블로그/카페 자동 글쓰기 솔루션</p>
+        </div>
+
+        <div class="card" style="background:linear-gradient(135deg,#fff5f5,#fef3c7);border:none;margin-bottom:16px;">
+          <div style="font-size:13px;color:#1f2937;line-height:1.8;">
+            <strong style="font-size:15px;">AI 기반 SNS 자동화</strong><br>
+            키워드만 입력하면 AI가 최신 트렌드를 분석하고, 네이버에 최적화된 글을 자동 생성/발행합니다.<br><br>
+            <strong>네이버 블로그</strong> — 상위 노출에 유리한 SEO 최적화 글 자동 발행<br>
+            <strong>네이버 카페</strong> — 카페 분위기에 맞는 글 자동 작성/등록<br>
+            <strong>자동 운영</strong> — 테마만 설정하면 매일 뉴스 분석 후 자동 발행<br>
+            <strong>글감 분석</strong> — 네이버 상위 글 크롤링 + AI 제목/구조 추천
+          </div>
+        </div>
+
+        <div class="panel-header" style="margin-top:24px;">
+          <h1 style="font-size:18px;">메이킷 계정</h1>
+          <p class="panel-sub">메이킷 계정으로 로그인하세요. 월/연간 구독자는 즉시 이용 가능합니다.</p>
+        </div>
+
+        <!-- 로그인 카드 (로그인 시 숨김) -->
+        <div class="card" id="loginCard">
+          <div class="card-header">
+            <h3>로그인</h3>
+          </div>
+          <div class="form">
+            <button class="btn btn-primary btn-full btn-lg" id="browserLoginBtn">
+              로그인
+            </button>
+            <div class="form-hint">
+              메이킷 계정으로 로그인합니다. Google 로그인 지원.<br>
+              월/연간 구독자는 로그인 즉시 이용 가능합니다.
+            </div>
+          </div>
+          <div class="form-hint" style="margin-top:20px;padding-top:16px;border-top:1px solid var(--border-soft);">
+            아직 구독 전이신가요?
+            <a id="pricingLink" href="#">snsmakeit.com/pricing</a> 에서 구독 후 로그인하세요.
+          </div>
+        </div>
+
+        <!-- 플랜 카드 -->
+        <div class="card" id="planCard">
+          <div class="plan-badge" id="planBadge">로그인 필요</div>
+          <div class="plan-title" id="planTitle">구독 정보 없음</div>
+          <div class="plan-desc" id="planDesc">로그인 후 구독 상태가 표시됩니다.</div>
+        </div>
+      </section>
+
+      <!-- 네이버 계정 설정 -->
+      <section class="panel hidden" data-panel="naver-account">
+        <div class="panel-header">
+          <h1>네이버 계정 설정</h1>
+          <p class="panel-sub">블로그와 카페 자동화에서 공통으로 사용할 네이버 계정을 관리합니다.</p>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><h3>저장된 계정</h3></div>
+          <div id="naverAccountList" class="form" style="margin-bottom:8px;">
+            <div style="font-size:12px;color:var(--text-dim);">저장된 계정이 없습니다. 아래에서 계정을 추가하세요.</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><h3>계정 추가/변경</h3></div>
+          <div class="form">
+            <label>네이버 ID <span class="tip">?<span class="tip-text">네이버에 로그인할 아이디입니다. blog.naver.com/{아이디} 형식으로 사용됩니다.</span></span></label>
+            <input type="text" id="naverId" placeholder="네이버 아이디 입력">
+            <label>비밀번호 <span class="tip">?<span class="tip-text">Windows Credential Manager에 암호화되어 저장됩니다. 앱 외부에서 접근할 수 없습니다.</span></span></label>
+            <input type="password" id="naverPw" placeholder="••••••••">
+            <button class="btn btn-outline" id="savePwBtn">계정 저장 (Windows 암호화)</button>
+            <button class="btn btn-primary" id="naverLoginBtn">네이버 로그인 (세션 저장)</button>
+            <div class="form-hint">
+              비밀번호는 Windows Credential Manager에 암호화 저장됩니다.<br>
+              "네이버 로그인" 버튼을 누르면 브라우저가 열립니다. 직접 로그인하면 세션이 저장되어 이후 자동으로 로그인됩니다.
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 네이버 블로그 자동화 -->
+      <section class="panel hidden" data-panel="naver-blog">
+        <div class="panel-header">
+          <h1>네이버 블로그</h1>
+          <p class="panel-sub">블로그 글을 자동으로 생성하고 발행합니다.</p>
+        </div>
+
+        <!-- 발행 방식 선택 (첫 화면) -->
+        <div id="blogModeSelect">
+          <div class="card" style="background:#fffbeb;border:1px solid #fbbf24;margin-bottom:16px;">
+            <div style="font-size:13px;color:#92400e;line-height:1.6;">
+              <strong>안내사항</strong><br>
+              블로그 글은 품질 유지를 위해 <strong>하루 3회 이내</strong> 작성을 권장합니다.<br>
+              그 이상 작성 시 네이버 저품질 판정을 받을 수 있으며, 이로 인한 불이익은 책임지지 않습니다.
+            </div>
+          </div>
+          <div class="mode-cards">
+            <div class="mode-card" id="modeManual">
+              <div class="mode-card-title">1회 / 예약 발행</div>
+              <div class="mode-card-desc">주제를 직접 입력하고 글감 분석 후 발행합니다. 예약 시간 설정도 가능합니다.</div>
+            </div>
+            <div class="mode-card" id="modeAutopilot">
+              <div class="mode-card-title">자동 운영</div>
+              <div class="mode-card-desc">테마만 설정하면 매일 최신 뉴스/트렌드를 분석해 자동으로 글을 발행합니다.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 자동 운영 화면 -->
+        <div id="blogAutopilotView" style="display:none;">
+          <button class="btn btn-back" id="autopilotBackBtn" style="margin-bottom:16px;">← 발행 방식 선택</button>
+
+          <div class="card">
+            <div class="card-header"><h3>네이버 계정</h3></div>
+            <div id="autopilotAccountList" class="form" style="margin-bottom:8px;">
+              <div style="font-size:12px;color:var(--text-dim);">저장된 계정 없음</div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header"><h3>자동 운영 설정</h3></div>
+            <div class="form">
+              <div class="form-hint" style="margin-bottom:14px;background:#eef6ff;padding:12px;border-radius:8px;color:#1e40af;line-height:1.6;">
+                테마를 설정하면 매일 자동으로 최신 뉴스/트렌드를 분석하여 글감을 생성하고 블로그에 발행합니다.<br>
+                컴퓨터가 켜져 있어야 합니다.
+              </div>
+
+              <label>테마 <span class="req">*</span> <span class="tip">?<span class="tip-text">이 테마와 관련된 네이버 뉴스, 블로그, Google News를 매일 자동으로 분석하여 글감을 생성합니다. 넓은 주제일수록 다양한 글이 나옵니다.</span></span></label>
+              <input type="text" id="autopilotTheme" placeholder="예: 심리상담, 부동산 투자, 건강관리">
+
+              <label>글 스타일</label>
+              <div class="chips" id="apSubtypeChips">
+                <button class="chip active" data-value="info">정보성</button>
+                <button class="chip" data-value="column">칼럼</button>
+                <button class="chip" data-value="article">기사</button>
+              </div>
+
+              <label>하루 발행 수</label>
+              <div class="chips" id="autopilotCountChips">
+                <button class="chip" data-value="1">1개</button>
+                <button class="chip" data-value="2">2개</button>
+                <button class="chip active" data-value="3">3개 (권장)</button>
+              </div>
+
+              <label>운영 기간</label>
+              <div class="chips" id="autopilotDurationChips">
+                <button class="chip" data-value="7">1주</button>
+                <button class="chip" data-value="14">2주</button>
+                <button class="chip active" data-value="30">1달</button>
+                <button class="chip" data-value="0">무기한</button>
+              </div>
+
+              <label>발행 시작 시간</label>
+              <input type="time" id="autopilotStartTime" value="09:00">
+              <div class="form-hint">이 시간부터 1~3분 랜덤 간격으로 발행합니다.</div>
+            </div>
+          </div>
+
+          <div class="card action-card">
+            <button class="btn btn-primary btn-full btn-lg" id="startAutopilotBtn">자동 운영 시작</button>
+            <button class="btn btn-outline btn-full" id="stopAutopilotBtn" style="display:none;">자동 운영 중지</button>
+          </div>
+
+          <div id="autopilotStatus" style="display:none;" class="card">
+            <div class="card-header"><h3>운영 상태</h3></div>
+            <div id="autopilotStatusBody" style="font-size:13px;line-height:1.6;color:var(--text-sub);"></div>
+          </div>
+        </div>
+
+        <!-- 1회/예약 발행 마법사 -->
+        <div id="blogManualView" style="display:none;">
+
+          <button class="btn btn-back" id="manualBackBtn" style="margin-bottom:16px;">← 발행 방식 선택</button>
+          <!-- 단계 표시 바 -->
+          <div class="step-bar" id="stepBar">
+          <div class="step-item active" data-step="1"><span class="step-num">1</span> 주제 입력</div>
+          <div class="step-item" data-step="2"><span class="step-num">2</span> 글감 분석</div>
+          <div class="step-item" data-step="3"><span class="step-num">3</span> 스타일 설정</div>
+          <div class="step-item" data-step="4"><span class="step-num">4</span> 발행</div>
+        </div>
+
+        <!-- Step 1: 주제 입력 -->
+        <div class="wiz-step" id="wizStep1">
+          <div class="card">
+            <div class="card-header"><h3>주제 입력</h3></div>
+            <div class="form">
+              <label>키워드 / 주제 <span class="req">*</span> <span class="tip">?<span class="tip-text">이 주제로 AI가 블로그 글을 생성합니다. 구체적일수록 좋은 글이 나옵니다. 예: "1인 사업자 절세 팁" → "절세"보다 훨씬 좋은 결과</span></span></label>
+              <input type="text" id="keyword" placeholder="예: 건강관리하는 방법">
+
+              <label>대상 독자 <span class="optional">(선택)</span> <span class="tip">?<span class="tip-text">글의 대상 독자를 지정하면 해당 독자에 맞는 톤과 수준으로 글이 생성됩니다.</span></span></label>
+              <input type="text" id="target" placeholder="예: 30~40대 직장인">
+
+              <label>네이버 블로그 템플릿 <span class="optional">(선택)</span> <span class="tip">?<span class="tip-text">네이버 블로그 글쓰기 → 우상단 "템플릿" → "내 템플릿"에 저장된 템플릿 이름을 정확히 입력하세요. 비워두면 기본 에디터를 사용합니다.</span></span></label>
+              <input type="text" id="naverTemplate" placeholder="예: 기본블로그 글양식">
+            </div>
+          </div>
+          <div class="wiz-nav">
+            <div></div>
+            <button class="btn btn-primary" id="step1Next">다음: 글감 분석</button>
+          </div>
+        </div>
+
+        <!-- Step 2: 글감 분석 -->
+        <div class="wiz-step hidden" id="wizStep2">
+          <div class="card">
+            <div class="card-header"><h3>글감 분석</h3></div>
+            <div class="form">
+              <div id="analysisLoading" style="text-align:center;padding:20px;color:var(--text-sub);">
+                네이버 상위글 분석 중... (10~20초)
+              </div>
+              <div id="analysisResult" style="display:none;">
+                <label>추천 제목 (클릭하여 선택)</label>
+                <div id="suggestedTitles"></div>
+                <label style="margin-top:14px;">상위글 구조 분석</label>
+                <div id="structureSummary" style="font-size:12px;color:var(--text-sub);line-height:1.6;background:var(--bg-elev);padding:12px;border-radius:8px;"></div>
+                <label style="margin-top:14px;">추가 프롬프트 <span class="optional">(자동 반영됨, 수정 가능)</span></label>
+                <textarea id="extra" rows="3" placeholder="상위글 분석 결과가 자동으로 반영됩니다"></textarea>
+              </div>
+              <div id="analysisError" style="display:none;color:var(--danger);font-size:13px;padding:10px;"></div>
+              <div id="analysisSkip" style="display:none;">
+                <div style="text-align:center;padding:16px;color:var(--text-sub);font-size:13px;">
+                  분석을 건너뛰었습니다. 직접 프롬프트를 작성하세요.
+                </div>
+                <label>추가 프롬프트 <span class="optional">(선택)</span></label>
+                <textarea id="extraManual" rows="3" placeholder="예: 구체적 숫자 포함, 실전 사례 위주"></textarea>
+              </div>
+            </div>
+          </div>
+          <div class="wiz-nav">
+            <button class="btn btn-outline" id="step2Prev">이전</button>
+            <div>
+              <button class="btn btn-outline" id="step2Skip" style="margin-right:8px;">분석 건너뛰기</button>
+              <button class="btn btn-primary" id="step2Next">다음: 스타일 설정</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 4: 스타일 설정 -->
+        <div class="wiz-step hidden" id="wizStep3">
+          <div class="card">
+            <div class="card-header"><h3>스타일 설정</h3></div>
+            <div class="form">
+              <label>글 타입</label>
+              <div class="chips" id="subtypeChips">
+                <button class="chip active" data-value="info">정보성 글</button>
+                <button class="chip" data-value="visit">체험·방문후기</button>
+                <button class="chip" data-value="travel">여행 후기</button>
+                <button class="chip" data-value="product">제품 후기</button>
+                <button class="chip" data-value="column">칼럼</button>
+                <button class="chip" data-value="article">기사 방식</button>
+              </div>
+
+              <label>글 톤</label>
+              <div class="chips" id="toneChips">
+                <button class="chip active" data-value="friendly">친근·정보형</button>
+                <button class="chip" data-value="diary">일기형</button>
+                <button class="chip" data-value="review">리뷰형</button>
+                <button class="chip" data-value="professional">전문형</button>
+              </div>
+
+              <label>말투</label>
+              <div class="chips" id="speechChips">
+                <button class="chip active" data-value="polite_yo">~요 체</button>
+                <button class="chip" data-value="formal">~합니다 체</button>
+                <button class="chip" data-value="casual">반말 체</button>
+                <button class="chip" data-value="mixed">혼합 체</button>
+              </div>
+
+              <label>분량</label>
+              <div class="chips" id="wordCountChips">
+                <button class="chip" data-value="short">보통 (1~1.5K)</button>
+                <button class="chip active" data-value="medium">길게 (2~3K)</button>
+                <button class="chip" data-value="long">아주 길게 (4K+)</button>
+              </div>
+            </div>
+          </div>
+          <!-- 프리셋 -->
+          <div class="card">
+            <div class="card-header"><h3>프리셋</h3></div>
+            <div class="form">
+              <label>현재 설정을 저장</label>
+              <div class="row">
+                <input type="text" id="presetName" placeholder="예: 정보성-친근-길게" style="flex:1;">
+                <button class="btn btn-outline btn-sm" id="savePresetBtn">저장</button>
+              </div>
+              <label style="margin-top:14px;">저장된 프리셋</label>
+              <div id="presetList" class="chips"></div>
+            </div>
+          </div>
+          <div class="wiz-nav">
+            <button class="btn btn-outline" id="step3Prev">이전</button>
+            <button class="btn btn-primary" id="step3Next">다음: 발행</button>
+          </div>
+        </div>
+
+        <!-- Step 5: 발행 방식 선택 + 실행 -->
+        <div class="wiz-step hidden" id="wizStep4">
+          <div class="card">
+            <div class="card-header"><h3>발행 확인</h3></div>
+            <div id="publishSummary" style="font-size:13px;line-height:1.8;color:var(--text-sub);"></div>
+          </div>
+
+          <!-- 발행 방식 선택 -->
+          <div class="card">
+            <div class="card-header"><h3>발행 방식</h3></div>
+            <div class="form">
+              <div class="chips" id="publishModeChips">
+                <button class="chip active" data-value="now">지금 1회 발행</button>
+                <button class="chip" data-value="schedule">예약 발행</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- 즉시 발행 -->
+          <div id="publishNowSection">
+            <div class="card action-card">
+              <button class="btn btn-primary btn-full btn-lg" id="runNowBtn">지금 1회 발행</button>
+              <button class="btn btn-outline btn-full" id="stopBtn" disabled>중지</button>
+            </div>
+          </div>
+
+          <!-- 예약 발행 (스케줄) -->
+          <div id="publishScheduleSection" style="display:none;">
+            <div class="card">
+              <div class="card-header"><h3>자동 실행 스케줄</h3></div>
+              <div class="form">
+                <div class="form-hint" style="margin-bottom:12px;">매일 지정 시간에 자동으로 발행됩니다. 컴퓨터가 켜져 있어야 합니다.</div>
+                <div id="scheduleTimes" class="schedule-times"></div>
+                <div class="row">
+                  <input type="time" id="newScheduleTime" value="09:00">
+                  <button class="btn btn-outline btn-sm" id="addTimeBtn">+ 시간 추가</button>
+                </div>
+                <div class="row" style="margin-top:12px;">
+                  <button class="btn btn-primary" id="saveScheduleBtn">스케줄 저장</button>
+                  <button class="btn btn-outline" id="clearScheduleBtn">모두 삭제</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card result-card" id="resultCard" style="display:none;">
+            <div class="card-header"><h3>결과</h3></div>
+            <div id="resultBody"></div>
+          </div>
+          <div class="wiz-nav">
+            <button class="btn btn-outline" id="step4Prev">이전 단계로</button>
+            <div></div>
+          </div>
+        </div>
+        </div><!-- /blogManualView -->
+
+        <!-- 네이버 카페 (준비 중) -->
+      </section>
+
+      <!-- 네이버 카페 패널 -->
+      <section class="panel hidden" data-panel="naver-cafe">
+        <div class="panel-header">
+          <h1>네이버 카페</h1>
+          <p class="panel-sub">카페에 자동으로 글을 작성합니다.</p>
+        </div>
+
+        <div class="card" style="background:#fffbeb;border:1px solid #fbbf24;margin-bottom:16px;">
+          <div style="font-size:13px;color:#92400e;line-height:1.6;">
+            <strong>안내사항</strong><br>
+            카페 글은 해당 카페의 규칙을 준수하세요. 스팸성 글은 카페 강퇴 및 네이버 계정 제재를 받을 수 있습니다.
+          </div>
+        </div>
+
+        <!-- 카페 모드 선택 -->
+        <div id="cafeModeSelect">
+          <div class="mode-cards">
+            <div class="mode-card" id="cafeModeManual">
+              <div class="mode-card-title">1회 발행</div>
+              <div class="mode-card-desc">주제를 직접 입력하고 카페에 글을 발행합니다.</div>
+            </div>
+            <div class="mode-card" id="cafeModeAutopilot">
+              <div class="mode-card-title">자동 운영</div>
+              <div class="mode-card-desc">테마를 설정하면 매일 자동으로 카페에 글을 발행합니다. 글 갯수를 자유롭게 설정할 수 있습니다.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 카페 1회 발행 (단계별) -->
+        <div id="cafeManualView" style="display:none;">
+          <button class="btn btn-back" id="cafeManualBackBtn" style="margin-bottom:16px;">← 발행 방식 선택</button>
+
+          <div class="step-bar" id="cafeStepBar">
+            <div class="step-item active" data-step="1"><span class="step-num">1</span> 카페 설정</div>
+            <div class="step-item" data-step="2"><span class="step-num">2</span> 주제 입력</div>
+            <div class="step-item" data-step="3"><span class="step-num">3</span> 글감 분석</div>
+            <div class="step-item" data-step="4"><span class="step-num">4</span> 발행</div>
+          </div>
+
+          <!-- Cafe Step 1: 카페 설정 -->
+          <div class="wiz-step" id="cafeStep1">
+            <div class="card">
+              <div class="card-header"><h3>카페 정보</h3></div>
+              <div class="form">
+                <label>카페 URL 이름 <span class="req">*</span> <span class="tip">?<span class="tip-text">카페 주소에서 cafe.naver.com/ 뒤에 오는 영문 이름입니다. 예: cafe.naver.com/test123 이면 "test123"을 입력하세요.</span></span></label>
+                <input type="text" id="cafeId" placeholder="예: test123">
+
+                <label>카페 번호 <span class="req">*</span> <span class="tip">?<span class="tip-text">카페 아무 글에 들어가서 주소창을 보세요. cafe.naver.com/test123?articleId=1&clubid=12345678 에서 clubid= 뒤 숫자가 카페 번호입니다.</span></span></label>
+                <input type="text" id="cafeNumber" placeholder="예: 12345678">
+
+                <label>게시판 번호 <span class="req">*</span> <span class="tip">?<span class="tip-text">글을 올릴 게시판을 클릭한 후 주소창에서 menuId= 뒤에 오는 숫자입니다. 예: ...menuId=15 이면 "15"를 입력하세요. 잘 모르면 비워두고 게시판 이름만 입력해도 됩니다.</span></span></label>
+                <input type="text" id="cafeMenuId" placeholder="예: 15">
+
+                <label>게시판 이름 <span class="tip">?<span class="tip-text">글을 올릴 게시판의 이름을 정확히 입력하세요. 카페에 있는 게시판 이름 그대로 적으면 됩니다. 예: "자유게시판", "일상 이야기"</span></span></label>
+                <input type="text" id="cafeBoardName" placeholder="예: 자유게시판">
+
+                <label>네이버 ID <span class="tip">?<span class="tip-text">블로그 자동화에서 저장한 네이버 계정이 자동으로 사용됩니다. 변경하려면 블로그 자동화에서 계정을 변경하세요.</span></span></label>
+                <input type="text" id="cafeNaverId" placeholder="블로그 자동화 계정 자동 사용" disabled style="opacity:0.6;">
+
+                <button class="btn btn-outline" id="saveCafeSettingsBtn">카페 설정 저장</button>
+              </div>
+            </div>
+            <div class="wiz-nav">
+              <div></div>
+              <button class="btn btn-primary" id="cafeStep1Next">다음 단계</button>
+            </div>
+          </div>
+
+          <!-- Cafe Step 2: 글 설정 -->
+          <div class="wiz-step hidden" id="cafeStep2">
+            <div class="card">
+              <div class="card-header"><h3>글 설정</h3></div>
+              <div class="form">
+                <label>키워드 / 주제 <span class="req">*</span> <span class="tip">?<span class="tip-text">이 주제로 AI가 카페 글을 생성합니다. 카페 주제에 맞는 키워드를 입력하세요.</span></span></label>
+                <input type="text" id="cafeKeyword" placeholder="예: 오늘의 경제 뉴스 정리">
+
+                <label>글 타입 <span class="tip">?<span class="tip-text">정보성: 정보 전달 위주, 칼럼: 의견/분석 위주, 기사: 뉴스 보도 형식</span></span></label>
+                <div class="chips" id="cafeSubtypeChips">
+                  <button class="chip active" data-value="info">정보성</button>
+                  <button class="chip" data-value="column">칼럼</button>
+                  <button class="chip" data-value="article">기사</button>
+                </div>
+
+                <label>추가 프롬프트 <span class="optional">(선택)</span> <span class="tip">?<span class="tip-text">AI에게 추가 지시사항을 줄 수 있습니다. 예: "카페 분위기에 맞게 친근하게", "전문 용어는 쉽게 풀어서"</span></span></label>
+                <textarea id="cafeExtra" rows="2" placeholder="예: 카페 분위기에 맞게 친근하게"></textarea>
+              </div>
+            </div>
+            <div class="wiz-nav">
+              <button class="btn btn-outline" id="cafeStep2Prev">이전</button>
+              <button class="btn btn-primary" id="cafeStep2Next">다음: 글감 분석</button>
+            </div>
+          </div>
+
+          <!-- Cafe Step 3: 글감 분석 -->
+          <div class="wiz-step hidden" id="cafeStep3">
+            <div class="card">
+              <div class="card-header"><h3>글감 분석</h3></div>
+              <div class="form">
+                <div id="cafeAnalysisLoading" style="text-align:center;padding:20px;color:var(--text-sub);">
+                  네이버 상위글 분석 중... (10~20초)
+                </div>
+                <div id="cafeAnalysisResult" style="display:none;">
+                  <label>추천 제목 (클릭하여 선택)</label>
+                  <div id="cafeSuggestedTitles"></div>
+                  <label style="margin-top:14px;">상위글 구조 분석</label>
+                  <div id="cafeStructureSummary" style="font-size:12px;color:var(--text-sub);line-height:1.6;background:var(--bg-elev);padding:12px;border-radius:8px;"></div>
+                  <label style="margin-top:14px;">추가 프롬프트 <span class="optional">(자동 반영됨, 수정 가능)</span></label>
+                  <textarea id="cafeAnalysisExtra" rows="3" placeholder="상위글 분석 결과가 자동으로 반영됩니다"></textarea>
+                </div>
+                <div id="cafeAnalysisError" style="display:none;color:var(--danger);font-size:13px;padding:10px;"></div>
+                <div id="cafeAnalysisSkip" style="display:none;">
+                  <div style="text-align:center;padding:16px;color:var(--text-sub);font-size:13px;">분석을 건너뛰었습니다.</div>
+                </div>
+              </div>
+            </div>
+            <div class="wiz-nav">
+              <button class="btn btn-outline" id="cafeStep3Prev">이전</button>
+              <div>
+                <button class="btn btn-outline" id="cafeStep3Skip" style="margin-right:8px;">건너뛰기</button>
+                <button class="btn btn-primary" id="cafeStep3Next">다음: 발행</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Cafe Step 4: 발행 -->
+          <div class="wiz-step hidden" id="cafeStep4">
+            <div class="card">
+              <div class="card-header"><h3>발행 확인</h3></div>
+              <div id="cafeSummary" style="font-size:13px;line-height:1.8;color:var(--text-sub);"></div>
+            </div>
+            <!-- 발행 방식 -->
+            <div class="card">
+              <div class="card-header"><h3>발행 방식</h3></div>
+              <div class="form">
+                <div class="chips" id="cafePublishModeChips">
+                  <button class="chip active" data-value="now">지금 1회 발행</button>
+                  <button class="chip" data-value="schedule">예약 발행</button>
+                </div>
+              </div>
+            </div>
+            <div id="cafePublishNowSection">
+              <div class="card action-card">
+                <button class="btn btn-primary btn-full btn-lg" id="runCafeBtn">카페 1회 발행</button>
+                <button class="btn btn-outline btn-full" id="stopCafeBtn" disabled>중지</button>
+              </div>
+            </div>
+            <div id="cafePublishScheduleSection" style="display:none;">
+              <div class="card">
+                <div class="card-header"><h3>예약 발행 스케줄</h3></div>
+                <div class="form">
+                  <div class="form-hint" style="margin-bottom:12px;">매일 지정 시간에 자동으로 카페에 발행됩니다.</div>
+                  <div id="cafeScheduleTimes" class="schedule-times"></div>
+                  <div class="row">
+                    <input type="time" id="cafeNewScheduleTime" value="10:00">
+                    <button class="btn btn-outline btn-sm" id="cafeAddTimeBtn">+ 시간 추가</button>
+                  </div>
+                  <div class="row" style="margin-top:12px;">
+                    <button class="btn btn-primary" id="saveCafeScheduleBtn">스케줄 저장</button>
+                    <button class="btn btn-outline" id="clearCafeScheduleBtn">모두 삭제</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="card result-card" id="cafeResultCard" style="display:none;">
+              <div class="card-header"><h3>결과</h3></div>
+              <div id="cafeResultBody"></div>
+            </div>
+            <div class="wiz-nav">
+              <button class="btn btn-outline" id="cafeStep4Prev">이전</button>
+              <div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 카페 자동 운영 -->
+        <div id="cafeAutopilotView" style="display:none;">
+          <button class="btn btn-back" id="cafeAutopilotBackBtn" style="margin-bottom:16px;">← 발행 방식 선택</button>
+
+          <div class="card">
+            <div class="card-header"><h3>카페 설정</h3></div>
+            <div class="form">
+              <label>카페 URL 이름 <span class="req">*</span> <span class="tip">?<span class="tip-text">cafe.naver.com/ 뒤의 영문 이름. 예: cafe.naver.com/test123 → "test123"</span></span></label>
+              <input type="text" id="cafeApCafeId" placeholder="예: test123">
+
+              <label>카페 번호 <span class="req">*</span> <span class="tip">?<span class="tip-text">카페 글 주소에서 clubid= 뒤 숫자</span></span></label>
+              <input type="text" id="cafeApCafeNumber" placeholder="예: 12345678">
+
+              <label>게시판 번호 <span class="req">*</span> <span class="tip">?<span class="tip-text">게시판 주소에서 menuId= 뒤 숫자</span></span></label>
+              <input type="text" id="cafeApMenuId" placeholder="예: 15">
+
+              <label>게시판 이름 <span class="tip">?<span class="tip-text">글을 올릴 게시판의 정확한 이름</span></span></label>
+              <input type="text" id="cafeApBoardName" placeholder="예: 자유게시판">
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header"><h3>자동 운영 설정</h3></div>
+            <div class="form">
+              <div class="form-hint" style="margin-bottom:14px;background:#eef6ff;padding:12px;border-radius:8px;color:#1e40af;line-height:1.6;">
+                테마를 설정하면 매일 자동으로 뉴스/트렌드를 분석해 카페에 글을 발행합니다.
+              </div>
+
+              <label>테마 <span class="req">*</span> <span class="tip">?<span class="tip-text">이 테마와 관련된 최신 뉴스와 트렌드를 분석하여 매일 자동으로 글감을 생성합니다.</span></span></label>
+              <input type="text" id="cafeApTheme" placeholder="예: 경제 뉴스, 부동산, 주식">
+
+              <label>하루 글 갯수 <span class="tip">?<span class="tip-text">카페는 블로그와 달리 글 갯수 제한이 자유롭습니다. 카페 규칙에 맞게 설정하세요. 너무 많으면 스팸으로 간주될 수 있습니다.</span></span></label>
+              <div style="display:flex;align-items:center;gap:12px;">
+                <input type="range" id="cafeApCount" min="1" max="30" value="5" style="flex:1;accent-color:var(--accent);">
+                <div id="cafeApCountBadge" style="min-width:42px;text-align:center;padding:6px 12px;border-radius:20px;background:var(--accent);color:#fff;font-size:14px;font-weight:700;">5</div>
+              </div>
+              <div class="form-hint">글 사이 1~3분 랜덤 간격으로 발행됩니다.</div>
+
+              <label>운영 기간</label>
+              <div class="chips" id="cafeApDurationChips">
+                <button class="chip" data-value="7">1주</button>
+                <button class="chip" data-value="14">2주</button>
+                <button class="chip active" data-value="30">1달</button>
+                <button class="chip" data-value="0">무기한</button>
+              </div>
+
+              <label>발행 시작 시간</label>
+              <input type="time" id="cafeApStartTime" value="10:00">
+            </div>
+          </div>
+
+          <div class="card action-card">
+            <button class="btn btn-primary btn-full btn-lg" id="startCafeApBtn">카페 자동 운영 시작</button>
+            <button class="btn btn-outline btn-full" id="stopCafeApBtn" style="display:none;">자동 운영 중지</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 자동화 현황 패널 (달력 + 상태) -->
+      <section class="panel hidden" data-panel="calendar">
+        <div class="panel-header">
+          <h1>자동화 현황</h1>
+          <p class="panel-sub">발행 이력과 자동 운영 상태를 확인하세요.</p>
+        </div>
+
+        <!-- 자동 운영 상태 카드 -->
+        <div class="card" id="dashboardAutopilotCard" style="display:none;">
+          <div class="card-header">
+            <h3>자동 운영</h3>
+            <div id="dashboardAutopilotBadge" style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;background:var(--success-soft);color:#065f46;">운영 중</div>
+          </div>
+          <div id="dashboardAutopilotInfo" style="font-size:13px;line-height:1.8;color:var(--text-sub);"></div>
+          <div style="margin-top:12px;">
+            <button class="btn btn-outline" id="dashboardStopBtn">자동 운영 중지</button>
+          </div>
+        </div>
+
+        <!-- 달력 -->
+        <div class="card">
+          <div class="card-header">
+            <h3 id="calendarTitle">2026년 4월</h3>
+            <div>
+              <button class="btn btn-outline btn-sm" id="calPrev" style="padding:4px 10px;">이전</button>
+              <button class="btn btn-outline btn-sm" id="calNext" style="padding:4px 10px;">다음</button>
+            </div>
+          </div>
+          <div id="calendarGrid" class="calendar-grid"></div>
+        </div>
+
+        <!-- 선택 날짜 이력 -->
+        <div class="card">
+          <div class="card-header">
+            <h3 id="dayHistoryTitle">오늘 발행 이력</h3>
+            <button class="btn btn-outline btn-sm" id="clearHistoryBtn">전체 삭제</button>
+          </div>
+          <div id="publishHistory" style="max-height:300px;overflow-y:auto;">
+            <div style="font-size:12px;color:var(--text-dim);padding:8px 0;">발행 이력이 없습니다.</div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- 실행 로그 패널 -->
+      <section class="panel hidden" data-panel="execlog">
+        <div class="panel-header">
+          <h1>실행 로그</h1>
+          <p class="panel-sub">자동화 실행 중 진행상황과 에러가 여기에 표시됩니다.</p>
+        </div>
+        <div class="card log-card">
+          <div class="card-header">
+            <h3>로그</h3>
+            <button class="btn btn-outline btn-sm" id="clearLogBtn">지우기</button>
+          </div>
+          <pre class="log" id="log">준비 완료.</pre>
+        </div>
+      </section>
+
+      <!-- 정보 패널 -->
+      <section class="panel hidden" data-panel="about">
+        <div class="panel-header">
+          <h1>정보</h1>
+          <p class="panel-sub">메이킷 SNS 자동화 v0.1.0</p>
+        </div>
+        <div class="card">
+          <div class="about-item">
+            <div class="about-label">웹사이트</div>
+            <a class="about-value brand-link" id="aboutWeb" href="#">https://snsmakeit.com/</a>
+          </div>
+          <div class="about-item">
+            <div class="about-label">지원 플랜</div>
+            <div class="about-value">Starter / Pro / Business</div>
+          </div>
+          <div class="about-item">
+            <div class="about-label">빌드</div>
+            <div class="about-value">0.1.0 · Electron 28 · Python 3.12</div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
